@@ -19,6 +19,10 @@ type Client struct {
 	Auth       ClientBasicAuth
 }
 
+type ErrorResponse struct {
+	Message string `json:"message"`
+}
+
 func NewClient(kibanaHost string, AuthOptions ClientBasicAuth) *Client {
 	return &Client{
 		BaseURL: kibanaHost,
@@ -43,7 +47,20 @@ func (c *Client) sendRequest(req *http.Request, v interface{}) error {
 	defer res.Body.Close()
 
 	if res.StatusCode < http.StatusOK || res.StatusCode >= http.StatusBadRequest {
-		return fmt.Errorf("unknown error, status code: %d", res.StatusCode)
+		dat, err := io.ReadAll(res.Body)
+		if err != nil {
+			return fmt.Errorf("unknown error, status code: %d", res.StatusCode)
+		}
+
+		var errorResponse ErrorResponse
+		err = json.Unmarshal(dat, &errorResponse)
+
+		if err != nil {
+			return fmt.Errorf("unknown error, status code: %d", res.StatusCode)
+		}
+
+		return fmt.Errorf("%s, status code: %d", errorResponse.Message, res.StatusCode)
+
 	}
 
 	dat, err := io.ReadAll(res.Body)
