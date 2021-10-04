@@ -245,10 +245,24 @@ func (r resourceAgentPolicy) ModifyPlan(ctx context.Context, req tfsdk.ModifyRes
 	req.Plan.Get(ctx, &plan)
 	req.State.Get(ctx, &state)
 
+	var id types.String
+	if !state.ID.Null && !state.ID.Unknown && state.ID.Value != "" {
+		id = types.String{Value: state.ID.Value}
+	} else {
+		id = types.String{Unknown: true}
+	}
+
+	var enrollmentToken types.String
+	if !state.EnrollmentToken.Null && !state.EnrollmentToken.Unknown && state.EnrollmentToken.Value != "" {
+		enrollmentToken = types.String{Value: state.EnrollmentToken.Value}
+	} else {
+		enrollmentToken = types.String{Unknown: true}
+	}
+
 	if !plan.ConfigJSON.Equal(state.ConfigJSON) {
 		var result = AgentPolicy{
-			ID:              plan.ID,
-			EnrollmentToken: plan.EnrollmentToken,
+			ID:              id,
+			EnrollmentToken: enrollmentToken,
 			ConfigJSON:      plan.ConfigJSON,
 			PackagePolicies: types.List{Unknown: true},
 		}
