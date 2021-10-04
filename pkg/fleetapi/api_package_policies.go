@@ -48,3 +48,29 @@ func (c *Client) PostPackagePolicies(ctx context.Context, request *map[string]in
 
 	return &res, nil
 }
+
+type DeleteAgentPolicyRequest struct {
+	PackagePolicyIDS []string `json:"packagePolicyIds"`
+}
+
+func (c *Client) DeletePackagePolicies(ctx context.Context, request *DeleteAgentPolicyRequest) (*[]map[string]interface{}, error) {
+	b, err := json.Marshal(request)
+	if err != nil {
+		// TODO better error handling
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", fmt.Sprintf("%s/api/fleet/package_policies/delete", c.BaseURL), bytes.NewBuffer(b))
+	if err != nil {
+		return nil, err
+	}
+
+	req = req.WithContext(ctx)
+
+	res := []map[string]interface{}{}
+	if err := c.sendRequest(req, &res); err != nil {
+		return nil, err
+	}
+
+	return &res, nil
+}

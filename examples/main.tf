@@ -21,7 +21,7 @@ provider "fleet" {
 resource "fleet_agent_policy" "test_policy" {
   config_json = <<EOL
   {
-    "name": "myconfigtest12345681012345679",
+    "name": "myconfigtest1234568101234567101",
     "namespace": "production",
     "package_policies": [{
       "name": "log-2",
@@ -64,7 +64,7 @@ resource "fleet_agent_policy" "test_policy" {
       ],
       "package": {
         "name": "log",
-        "title": "Custom logs",
+        "title": "Custom logs111 19",
         "version": "0.5.0"
       }
     }]
